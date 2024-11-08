@@ -1,0 +1,11 @@
+{% extends 'newindex.html' %}
+{% block body %}
+<div class="container my-5">
+    <div class="alert alert-danger">
+        <h3>Payment Failed!</h3>
+        <p>Unfortunately, your payment for Order {{ order.id }} failed.</p>
+        <p>Error: {{ error }}</p>
+        <a href="{% url 'book_now' order.product.id %}" class="btn btn-primary">Try Again</a>
+    </div>
+</div>
+{% endblock %}

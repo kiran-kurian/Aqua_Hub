@@ -1,0 +1,152 @@
+{% extends 'newindex.html' %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row">
+        <!-- Product Image Section -->
+        <div class="col-md-6">
+            <div class="product-image-wrapper">
+                <img src="{{ product.image.url }}" alt="{{ product.product_name }}" class="img-fluid shadow-lg" style="max-height: 650px; object-fit: contain; width: 100%;">
+            </div>
+        </div>
+
+        <!-- Product and Care Info Section -->
+        <div class="col-md-6">
+            <div class="product-details">
+                <h2 class="text-primary">{{ product.product_name }}</h2>
+                <h4 class="text-success">₹{{ product.price }}</h4>
+                <p class="text-muted">{{ product.description }}</p>
+
+                <!-- Stock Check -->
+                {% if product.stock > 0 %}
+                    <p class="text-info">In Stock: {{ product.stock }}</p>
+                {% endif %}
+
+                <!-- Quantity Selector -->
+                {% if product.stock > 0 %}
+                <div class="my-3">
+                    <label for="quantity" class="form-label">Quantity:</label>
+                    <form method="POST" action="{% url 'add_to_cart' product.id %}" id="cartForm">
+                        {% csrf_token %}
+                        <input type="number" id="quantity" name="quantity" class="form-control text-center" min="1" max="{{ product.stock }}" value="1" style="width: 100px;">
+                        <div class="d-flex gap-3 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg" id="addToCartBtn">Add to Cart</button>
+                        </div>
+                    </form>
+                    <div id="error-message" class="text-danger mt-2" style="display: none;"></div> <!-- Error message -->
+                </div>
+                
+                <!-- Book Now Button Section -->
+                <div class="d-flex gap-3 mt-4">
+                    <form method="POST" action="{% url 'select_address' product.id  %}" id="bookForm">
+                        {% csrf_token %}
+                        <input type="hidden" id="bookQuantity" name="quantity" value="1" min="1" max="{{ product.stock}}"> <!-- Hidden quantity field -->
+                        <button type="submit" class="btn btn-warning btn-lg" id="bookNowBtn">Book Now</button>
+                    </form>
+                </div>
+
+                {% else %}
+                    <button class="btn btn-secondary btn-lg" disabled>Out of Stock</button>
+                {% endif %}
+
+                <!-- Return Policy -->
+                <div class="my-4">
+                    <h5 class="fw-bold">Return Policy</h5>
+                    <p class="text-muted">Eligible for return within 7 days of delivery. Items must be unused and in original packaging. Live products (e.g., fish) can only be returned if dead or unhealthy upon delivery with proof within 24 hours.</p>
+                </div>
+
+                <!-- Seller Details Section -->
+                <div class="my-4">
+                    <h5 class="fw-bold">Seller Details</h5>
+                    <table class="table table-bordered table-sm">
+                        <tbody>
+                            <tr>
+                                <th>Shop Name</th>
+                                <td>{{ product.seller.shop_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Contact</th>
+                                <td>{{ product.seller.contact_num }}</td>
+                            </tr>
+                            <tr>
+                                <th>Location</th>
+                                <td>{{ product.seller.location }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fish Care Information -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card shadow-sm p-4">
+                <h4 class="fw-bold text-primary">Care Information for {{ product.product_name }}</h4>
+                <table class="table table-bordered table-striped mt-3">
+                    <tbody>
+                        <tr>
+                            <th>Water Quality</th>
+                            <td>{{ product.water_quality }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tank Size</th>
+                            <td>{{ product.tank_size }}</td>
+                        </tr>
+                        <tr>
+                            <th>Feeding</th>
+                            <td>{{ product.feeding }}</td>
+                        </tr>
+                        <tr>
+                            <th>Behavior</th>
+                            <td>{{ product.behavior }}</td>
+                        </tr>
+                        <tr>
+                            <th>Health Issues</th>
+                            <td>{{ product.health_issues }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('cartForm');
+        const quantityInput = document.getElementById('quantity');
+        const maxQuantity = parseInt(quantityInput.max); // Maximum stock
+        const errorMessage = document.getElementById('error-message');
+
+        // Add to Cart form validation
+        form.addEventListener('submit', function (event) {
+            const selectedQuantity = parseInt(quantityInput.value);
+            if (selectedQuantity > maxQuantity) {
+                errorMessage.textContent = `Only ${maxQuantity} items in stock. Please select a lower quantity.`;
+                errorMessage.style.display = 'block';
+                event.preventDefault(); // Prevent form submission
+            } else {
+                errorMessage.style.display = 'none'; // Hide the error message if input is valid
+            }
+        });
+
+        // Book Now button validation
+        const bookNowBtn = document.getElementById('bookNowBtn');
+        const bookQuantityInput = document.getElementById('bookQuantity');
+        bookNowBtn.addEventListener('click', function (event) {
+            const selectedQuantity = parseInt(quantityInput.value);
+            if (!selectedQuantity || selectedQuantity < 1 || selectedQuantity > maxQuantity) {
+                errorMessage.textContent = `Please select a valid quantity between 1 and ${maxQuantity}.`;
+                errorMessage.style.display = 'block';
+                event.preventDefault();
+            } else {
+                errorMessage.style.display = 'none'; // Clear error message
+                bookQuantityInput.value = selectedQuantity; // Set the quantity in the hidden input for booking
+            }
+        });
+    });
+</script>
+
+{% endblock %}

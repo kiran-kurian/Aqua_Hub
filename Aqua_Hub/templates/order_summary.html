@@ -1,0 +1,35 @@
+{% extends 'newindex.html' %}
+
+{% block body %}
+<div class="container my-5">
+    <h2 class="text-primary mb-4">Order Summary</h2>
+    <div class="card shadow-lg p-4">
+        <h4 class="fw-bold">{{ order.product.product_name }}</h4>
+        <p class="text-muted">Price per item: ₹{{ order.product.price }}</p>
+        <p class="text-info">Quantity: {{ order.quantity }}</p>
+        <p class="text-success">Total Price: ₹{{ total_price }}</p>
+
+        <!-- Delivery Charge -->
+        <p class="text-info">Delivery Charge: ₹{{ delivery_charge }}</p>
+
+        <!-- Final Price including delivery charge -->
+        <p class="text-danger">Final Price: ₹{{ final_price }}</p>
+
+        <!-- Razorpay Payment Form -->
+        <form action="{% url 'payment_handler' %}" method="POST">
+            {% csrf_token %}
+            <script
+                src="https://checkout.razorpay.com/v1/checkout.js"
+                data-key="{{ razorpay_key_id }}"
+                data-amount="{{ final_price|floatformat:2 }}00"  
+                data-currency="INR"
+                data-order_id="{{ razorpay_order_id }}"
+                data-buttontext="Pay Now"
+                data-name="Aqua Hub"
+                data-description="Order Payment"
+                data-theme.color="#3399cc"
+            ></script>
+        </form>
+    </div>
+</div>
+{% endblock %}

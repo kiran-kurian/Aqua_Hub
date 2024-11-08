@@ -1,0 +1,89 @@
+{% extends 'newindex.html' %}
+
+{% block body %}
+<div class="container my-5">
+    <!-- Blog Header Section -->
+    <div class="text-center">
+        <h1 class="text-primary display-4">{{ blog.title }}</h1>
+        <p class="text-muted">Posted by <strong>{{ blog.author.username }}</strong> on {{ blog.created_at|date:"F j, Y" }}</p>
+    </div>
+
+    <!-- Blog Image (Smaller and Centered) -->
+    {% if blog.image %}
+    <div class="text-center my-4">
+        <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="img-fluid rounded shadow-sm" style="max-height: 300px; object-fit: cover; width: 75%;">
+    </div>
+    {% endif %}
+
+    <!-- Blog Content -->
+    <div class="content mt-4">
+        <p class="lead">{{ blog.content }}</p>
+    </div>
+
+    <hr class="my-5">
+
+    <!-- Comments Section -->
+    <h4 class="mb-4">Comments</h4>
+    <div class="comments-section mb-5">
+        {% for comment in blog.comments.all %}
+        <div class="comment bg-light p-3 rounded mb-3">
+            <p><strong>{{ comment.user.username }}</strong> <small class="text-muted">{{ comment.created_at|date:"F j, Y, g:i a" }}</small></p>
+            <p>{{ comment.content }}</p>
+        </div>
+        {% empty %}
+        <p class="text-muted">No comments yet. Be the first to comment!</p>
+        {% endfor %}
+    </div>
+
+    <!-- Add a Comment Section -->
+    <div class="add-comment-section mt-5">
+        <h5 class="mb-4">Leave a Comment</h5>
+        <form method="POST" action="{% url 'add_comment' blog.id %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <textarea name="content" class="form-control" rows="4" placeholder="Enter your comment here..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Post Comment</button>
+        </form>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    .display-4 {
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+
+    .lead {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        color: #333;
+    }
+
+    .content {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #333;
+    }
+
+    .comment {
+        border-left: 4px solid #007bff;
+        padding-left: 15px;
+    }
+
+    .comments-section h4 {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .add-comment-section h5 {
+        font-weight: bold;
+        color: #343a40;
+    }
+
+    .add-comment-section textarea {
+        font-size: 1rem;
+    }
+</style>
+{% endblock %}

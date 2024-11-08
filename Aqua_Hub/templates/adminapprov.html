@@ -1,0 +1,81 @@
+{% extends 'admin.html' %}
+
+{% block body %}
+<div class="container">
+    <h2>Pending Seller Approvals</h2>
+
+    {% if pending_sellers %}
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th style="border: 1px solid #ddd; padding: 8px;">Shop Name</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Username</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Email</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Location</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Licensing Document</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for seller in pending_sellers %}
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;">{{ seller.shop_name }}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">{{ seller.username }}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">{{ seller.email }}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">{{ seller.location }}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">
+                    {% if seller.licensing_document %}
+                    <a href="{{ seller.licensing_document.url }}" target="_blank">View Document</a>
+                    {% else %}
+                    No document uploaded
+                    {% endif %}
+                </td>
+                <td style="border: 1px solid #ddd; padding: 8px;">
+                    <form method="POST" action="{% url 'approve_seller' seller.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" style="padding: 5px 10px; background-color: #28a745; color: white; border: none; cursor: pointer;">Approve</button>
+                    </form>
+
+                    <!-- Reject button to open rejection modal -->
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal{{ seller.id }}">
+                        Reject
+                    </button>
+
+                    <!-- Modal for rejection reason -->
+                    <div class="modal fade" id="rejectModal{{ seller.id }}" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="rejectModalLabel">Reason for Rejection</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form method="POST" action="{% url 'reject_seller' seller.id %}">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="reason">Reason for Rejection:</label>
+                                            <textarea class="form-control" id="reason" name="reason" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-danger">Reject Seller</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No pending sellers found.</p>
+    {% endif %}
+</div>
+
+<!-- Add Bootstrap JS for Modal -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+{% endblock %}

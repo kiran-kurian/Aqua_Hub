@@ -1,0 +1,206 @@
+{% extends 'newindex.html' %}
+
+{% block body %}
+<div class="container my-5">
+    <h2 class="text-center">Your Virtual Aquarium</h2>
+
+    {% if virtual_tank %}
+    <div class="virtual-tank-container text-center my-5">
+        <h4>Dimensions: {{ virtual_tank.height }} cm (Height) x {{ virtual_tank.width }} cm (Width) x {{ virtual_tank.depth }} cm (Depth)</h4>
+
+        <!-- Virtual Aquarium -->
+        <div class="virtual-tank-wrapper mx-auto" id="aquarium"></div>
+
+        <p class="pt-4 text-muted">This is your virtual aquarium. You can add more features later!</p>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        No virtual aquarium created yet. <a href="{% url 'create_virtual_tank' %}">Create one here</a>.
+    </div>
+    {% endif %}
+</div>
+
+<!-- Custom Styles for Virtual Tank -->
+<style>
+    .virtual-tank-container {
+        padding: 20px;
+        border-radius: 15px;
+        background-color: #f9f9f9;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .virtual-tank-wrapper {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        height: 500px; /* Keep this as a fixed height for visibility */
+        margin: auto;
+    }
+</style>
+
+<!-- Include three.js and OrbitControls -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
+
+<!-- JavaScript for Enhanced 3D Aquarium -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const height = {{ virtual_tank.height }};
+        const width = {{ virtual_tank.width }};
+        const depth = {{ virtual_tank.depth }};
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xffffff); // Set background to white
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const aquariumContainer = document.getElementById('aquarium');
+        aquariumContainer.appendChild(renderer.domElement);
+
+        // Add lighting
+        const ambientLight = new THREE.AmbientLight(0xcccccc, 0.7); // Slightly dimmed for subtle effect
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Increased intensity for better visibility
+        directionalLight.position.set(0, height / 100, depth / 100);
+        scene.add(directionalLight);
+
+        // Aquarium glass material with reflections
+        const glassMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0x1E90FF, // Changed aquarium color to blue
+            transparent: true,
+            opacity: 0.5, // Increased opacity for visibility
+            roughness: 0.1,
+            metalness: 0.1,
+            reflectivity: 0.5,
+            transmission: 1.0, // Enable transmission for glass-like material
+            thickness: 0.5
+        });
+
+        const aquariumGeometry = new THREE.BoxGeometry(width / 100, height / 100, depth / 100);
+        const aquarium = new THREE.Mesh(aquariumGeometry, glassMaterial);
+        scene.add(aquarium);
+
+        // Water material
+        const waterGeometry = new THREE.PlaneGeometry(width / 100, depth / 100);
+        const waterMaterial = new THREE.MeshStandardMaterial({
+            color: 0x1e90ff,
+            transparent: true,
+            opacity: 0.7, // Adjusted opacity for better water visibility
+            roughness: 0.2,
+            metalness: 0.5
+        });
+        const water = new THREE.Mesh(waterGeometry, waterMaterial);
+        water.rotation.x = - Math.PI / 2;
+        water.position.y = 0; // Position at the bottom
+        scene.add(water);
+
+        // Create simple fish models
+        const fishGroup = new THREE.Group();
+
+        function createFish(color, size) {
+            const fish = new THREE.Group();
+
+            // Body
+            const bodyGeometry = new THREE.SphereGeometry(size, 16, 16);
+            const bodyMaterial = new THREE.MeshStandardMaterial({ color: color });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            fish.add(body);
+
+            // Tail
+            const tailGeometry = new THREE.ConeGeometry(size / 2, size, 16);
+            const tailMaterial = new THREE.MeshStandardMaterial({ color: color });
+            const tail = new THREE.Mesh(tailGeometry, tailMaterial);
+            tail.rotation.z = Math.PI / 2;
+            tail.position.x = -size;
+            fish.add(tail);
+
+            // Eye
+            const eyeGeometry = new THREE.SphereGeometry(size / 4, 8, 8);
+            const eyeMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+            const eye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            eye.position.set(size / 2, size / 2, size / 2);
+            fish.add(eye);
+
+            return fish;
+        }
+
+        // Create multiple fish
+        const fishColors = [0xff6347, 0x32cd32, 0xff69b4]; // Tomato, LimeGreen, HotPink
+        for (let i = 0; i < 5; i++) {
+            const color = fishColors[i % fishColors.length];
+            const size = Math.random() * 0.05 + 0.05; // Random size between 0.05 and 0.1
+            const fish = createFish(color, size);
+
+            // Random initial position within the aquarium
+            fish.position.set(
+                (Math.random() - 0.5) * (width / 100 - 0.2),
+                (Math.random() - 0.5) * (height / 100 - 0.2),
+                (Math.random() - 0.5) * (depth / 100 - 0.2)
+            );
+
+            // Assign a random speed and direction
+            fish.userData = {
+                speed: Math.random() * 0.005 + 0.002,
+                direction: new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize()
+            };
+
+            fishGroup.add(fish);
+        }
+
+        scene.add(fishGroup);
+
+        // Camera controls
+        camera.position.set(0, height / 100 * 0.75, height / 100 * 2); // Adjusted camera height for better visibility
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = (height / 100) * 1.2;
+        controls.maxDistance = (height / 100) * 3;
+        controls.enablePan = true; // Enable panning for better exploration
+        controls.maxPolarAngle = Math.PI / 2;
+
+        // Responsive resizing of the canvas
+        window.addEventListener('resize', function() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            renderer.setSize(width, height);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Animate fish movement
+            fishGroup.children.forEach(fish => {
+                // Move fish
+                fish.position.add(fish.userData.direction.clone().multiplyScalar(fish.userData.speed));
+
+                // Bounce off the aquarium walls
+                if (fish.position.x > (width / 100) / 2 - 0.1 || fish.position.x < -(width / 100) / 2 + 0.1) {
+                    fish.userData.direction.x *= -1;
+                }
+                if (fish.position.y > (height / 100) / 2 - 0.1 || fish.position.y < -(height / 100) / 2 + 0.1) {
+                    fish.userData.direction.y *= -1;
+                }
+                if (fish.position.z > (depth / 100) / 2 - 0.1 || fish.position.z < -(depth / 100) / 2 + 0.1) {
+                    fish.userData.direction.z *= -1;
+                }
+
+                // Optional: Rotate fish to face movement direction
+                const axis = new THREE.Vector3(0, 1, 0);
+                fish.quaternion.setFromUnitVectors(axis, fish.userData.direction.clone().normalize());
+            });
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    });
+</script>
+{% endblock %}

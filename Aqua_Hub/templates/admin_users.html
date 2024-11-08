@@ -1,0 +1,85 @@
+{% extends 'admin.html' %}
+
+{% block body %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">Manage Users</h2>
+
+    {% if users %}
+    <table  class="table table-striped table-bordered table-hover" style="width: 100%; border-collapse: collapse;" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th style="border: 1px solid #ddd; padding: 8px;">Username</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Email</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Status</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Action</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;">{{ user.username }}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">{{ user.email }}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">
+                    {% if user.is_active %}
+                        <span class="badge bg-success">Active</span>
+                    {% else %}
+                        <span class="badge bg-danger">Blocked</span>
+                    {% endif %}
+                </td>
+                <td style="border: 1px solid #ddd; padding: 8px;">
+                    <form method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        {% if user.is_active %}
+                        <button type="submit" name="action" value="block" class="btn btn-danger">Block</button>
+                        {% else %}
+                        <button type="submit" name="action" value="unblock" class="btn btn-success">Unblock</button>
+                        {% endif %}
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No users registered yet.</p>
+    {% endif %}
+</div>
+
+<!-- Custom Styles similar to seller approval page -->
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+    tr:hover {
+        background-color: #e8f5e9;
+    }
+    .btn {
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .btn-danger {
+        background-color: #d9534f;
+        color: white;
+        border: none;
+    }
+    .btn-success {
+        background-color: #5cb85c;
+        color: white;
+        border: none;
+    }
+</style>
+{% endblock %}

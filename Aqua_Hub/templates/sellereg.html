@@ -1,0 +1,274 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Registration - Aqua Hub</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e0f7e5; /* Light green background */
+            margin: 0;
+            padding: 0;
+            height: auto;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align the form to start from the top */
+            padding-top: 50px; /* Adjust padding to make the top visible */
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.8); /* Slightly opaque white */
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+            margin-bottom: 50px; /* Extra margin to avoid the bottom getting too close */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-container:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            text-align: center;
+            color: #0077b6;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        label {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="password"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background: #f9f9f9;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
+        input[type="password"]:focus,
+        input[type="file"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #28a745;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745; /* Green button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #218838; /* Darker green on hover */
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #e63946;
+            font-size: 12px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .terms {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .terms input {
+            margin-right: 8px;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Username validation
+            const usernameInput = document.getElementById('username');
+            const usernameError = document.createElement('div');
+            usernameError.className = 'error-message';
+            usernameInput.parentNode.insertBefore(usernameError, usernameInput.nextSibling);
+
+            usernameInput.addEventListener('input', function () {
+                const usernameRegex = /^[A-Za-z0-9]+$/; // Only alphanumeric characters allowed
+                if (!usernameRegex.test(usernameInput.value)) {
+                    usernameError.textContent = 'Username cannot contain special characters or spaces.';
+                    usernameInput.classList.add('error');
+                } else {
+                    usernameError.textContent = '';
+                    usernameInput.classList.remove('error');
+                }
+            });
+
+            // Password length validation
+            const passwordInput = document.getElementById('password');
+            const passwordError = document.createElement('div');
+            passwordError.className = 'error-message';
+            passwordInput.parentNode.insertBefore(passwordError, passwordInput.nextSibling);
+
+            passwordInput.addEventListener('input', function () {
+                if (passwordInput.value.length < 8) {
+                    passwordError.textContent = 'Password must be at least 8 characters long.';
+                    passwordInput.classList.add('error');
+                } else {
+                    passwordError.textContent = '';
+                    passwordInput.classList.remove('error');
+                }
+            });
+
+            // Phone number validation
+            const phoneInput = document.getElementById('contact_num');
+            const phoneError = document.createElement('div');
+            phoneError.className = 'error-message';
+            phoneInput.parentNode.insertBefore(phoneError, phoneInput.nextSibling);
+
+            phoneInput.addEventListener('input', function () {
+                if (!/^[6-9]\d{9}$/.test(phoneInput.value)) {
+                    phoneError.textContent = 'Phone number must be 10 digits and start with 6-9.';
+                    phoneInput.classList.add('error');
+                } else {
+                    phoneError.textContent = '';
+                    phoneInput.classList.remove('error');
+                }
+            });
+
+            // Location validation for pincode
+            const locationInput = document.getElementById('location');
+            const locationError = document.createElement('div');
+            locationError.className = 'error-message';
+            locationInput.parentNode.insertBefore(locationError, locationInput.nextSibling);
+
+            locationInput.addEventListener('input', function () {
+                const pincodePattern = /\b\d{6}\b/;
+                if (!pincodePattern.test(locationInput.value)) {
+                    locationError.textContent = 'Location must include a valid 6-digit pincode.';
+                    locationInput.classList.add('error');
+                } else {
+                    locationError.textContent = '';
+                    locationInput.classList.remove('error');
+                }
+            });
+
+            // Email validation
+            const emailInput = document.getElementById('email');
+const emailError = document.createElement('div');
+emailError.className = 'error-message';
+emailInput.parentNode.insertBefore(emailError, emailInput.nextSibling);
+
+emailInput.addEventListener('input', function () {
+    // Updated regex: allows numbers, but the first character can't be a digit
+    const emailRegex = /^[^\d][\w.+-]+@[a-zA-Z]+\.[a-zA-Z]+$/;
+    if (!emailRegex.test(emailInput.value)) {
+        emailError.textContent = 'Invalid email. First character cannot be a number and must contain "@"';
+        emailInput.classList.add('error');
+    } else {
+        emailError.textContent = '';
+        emailInput.classList.remove('error');   
+    }
+});
+
+            // Licensing document validation
+            const licenseInput = document.getElementById('licensing-document');
+            const licenseError = document.createElement('div');
+            licenseError.className = 'error-message';
+            licenseInput.parentNode.insertBefore(licenseError, licenseInput.nextSibling);
+
+            licenseInput.addEventListener('change', function () {
+                const file = licenseInput.files[0];
+                if (file && file.type !== 'application/pdf') {
+                    licenseError.textContent = 'Licensing document must be a PDF.';
+                    licenseInput.classList.add('error');
+                } else {
+                    licenseError.textContent = '';
+                    licenseInput.classList.remove('error');
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Seller Registration</h2>
+        <form action="{% url 'sellereg' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="shop-name">Shop Name</label>
+                <input type="text" id="shop-name" name="shop_name" required>
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="text" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="location">Location (including 6-digit pincode)</label>
+                <input type="text" id="location" name="location" placeholder="Address, City, State, Zip" required>
+            </div>
+            <div class="form-group">
+                <label for="contact_num">Contact Number</label>
+                <input type="tel" id="contact_num" name="contact_num" required>
+            </div>
+            <div class="form-group">
+                <label for="product-type">Type of Products</label>
+                <select id="product-type" name="product_type" required>
+                    <option value="fish">Fish</option>
+                    <option value="aquariums">Aquariums</option>
+                    <option value="fish-food">Fish Food</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="licensing-document">Licensing Document (PDF)</label>
+                <input type="file" id="licensing-document" name="licensing_document" accept="application/pdf" required>
+                <div class="error-message"></div>
+            </div>
+            <div class="form-group terms">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">I agree to the Terms and Conditions</label>
+            </div>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</body>
+</html>

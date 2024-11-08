@@ -1,0 +1,35 @@
+{% extends 'newindex.html' %}
+
+{% block body %}
+<div class="container my-5">
+    <h2 class="text-center">Create Your Virtual Aquarium</h2>
+
+    <div class="tank-size-selection">
+        <label for="height">Select Height (in cm):</label>
+        <input type="number" id="height" placeholder="Height" required>
+
+        <label for="width">Select Width (in cm):</label>
+        <input type="number" id="width" placeholder="Width" required>
+
+        <label for="depth">Select Depth (in cm):</label>
+        <input type="number" id="depth" placeholder="Depth" required>
+
+        <button class="btn btn-success mt-3" id="create-tank-btn">Create Virtual Tank</button>
+    </div>
+</div>
+
+<script>
+    document.getElementById('create-tank-btn').addEventListener('click', function() {
+        const height = document.getElementById('height').value;
+        const width = document.getElementById('width').value;
+        const depth = document.getElementById('depth').value; // Added depth variable
+
+        if (height && width && depth) { // Check if height, width, and depth are provided
+            window.location.href = `{% url 'create_virtual_tank' %}?height=${height}&width=${width}&depth=${depth}`; // Pass depth to the URL
+        } else {
+            alert("Please enter height, width, and depth.");
+        }
+    });
+</script>
+
+{% endblock %}

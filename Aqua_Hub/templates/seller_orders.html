@@ -1,0 +1,40 @@
+{% extends 'sellerdash.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">Orders for Your Products</h2>
+
+    {% if orders %}
+    <table class="table table-bordered table-hover">
+        <thead class="table-primary">
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Total Price</th>
+                <th>Order Status</th>
+                <th>Payment Status</th>
+                <th>Payment ID</th>
+                <th>order Status</th>
+                <th>Date Ordered</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.product.product_name }}</td>
+                <td>{{ order.quantity }}</td>
+                <td>₹{{ order.total_price }}</td>
+                <td>{{ order.order_status }}</td>
+                <td>{{ order.payment_status }}</td>
+                <td>{{ order.payment_id }}</td>
+                <td>{{ order.order_status }}</td>
+                <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No orders available for your products.</p>
+    {% endif %}
+</div>
+{% endblock %}

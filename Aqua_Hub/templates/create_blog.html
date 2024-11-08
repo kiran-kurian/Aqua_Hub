@@ -1,0 +1,55 @@
+{% extends 'newindex.html' %}
+
+{% block body %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">Create a New Blog Post</h2>
+
+    <form id="createBlogForm" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- Blog Title -->
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" id="title" name="title" class="form-control" placeholder="Enter the blog title" required>
+        </div>
+
+            
+       
+        <!-- Blog Content -->
+        <div class="mb-3">
+            <label for="content" class="form-label">Content</label>
+            <textarea id="content" name="content" class="form-control" rows="6" placeholder="Write the main content of your blog" required></textarea>
+        </div>
+
+        <!-- Blog Image -->
+        <div class="mb-3">
+            <label for="image" class="form-label">Upload Blog Image</label>
+            <input type="file" id="image" name="image" class="form-control" accept="image/*">
+            <small class="text-muted">Optional: Upload an image related to your blog post.</small>
+        </div>
+
+        <!-- Comment Section Enabled -->
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="allow_comments" name="allow_comments">
+            <label for="allow_comments" class="form-check-label">Allow Comments on this Post</label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-success">Post Blog</button>
+    </form>
+</div>
+
+<!-- Add JavaScript for form validation (optional) -->
+<script>
+    document.getElementById('createBlogForm').addEventListener('submit', function (event) {
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const content = document.getElementById('content').value.trim();
+        
+        if (!title || !description || !content) {
+            alert('Please fill in all required fields.');
+            event.preventDefault();
+        }
+    });
+</script>
+
+{% endblock %}

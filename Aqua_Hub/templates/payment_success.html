@@ -1,0 +1,10 @@
+{% extends 'newindex.html' %}
+{% block body %}
+<div class="container my-5">
+    <div class="alert alert-success">
+        <h3>Payment Successful!</h3>
+        <p>Your payment for Order {{ order.id }} has been completed.</p>
+        <a href="{% url 'completed_orders' %}" class="btn btn-primary">View Your Orders</a>
+    </div>
+</div>
+{% endblock %}

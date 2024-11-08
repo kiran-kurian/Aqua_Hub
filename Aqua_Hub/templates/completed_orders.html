@@ -1,0 +1,58 @@
+{% extends 'newindex.html' %}
+
+{% block body %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">My Completed Orders</h2>
+
+    {% if completed_orders %}
+    <div class="table-responsive">
+        <table class="table table-bordered text-center">
+            <thead class="table-success">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Payment ID</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                    <th>Order Date</th>
+                    <th>Delivery Address</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in completed_orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.payment_id }}</td>
+                    <td>{{ order.product.product_name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>₹{{ order.total_price }}</td>
+                    <td>{{ order.created_at|date:"F j, Y" }}</td>
+                    <td>{{ order.address.full_name }}
+                        {{ order.address.address }}
+                        {{ order.address.pincode }}
+                        {{ order.address.contact1 }}
+                        {{ order.address.contact2 }}
+
+                    </td>
+                    <td>
+                        <span class="badge bg-success">Order Confirmed</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        You have no completed orders yet.
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .table th, .table td {
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}

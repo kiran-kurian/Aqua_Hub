@@ -1,0 +1,149 @@
+{% extends 'newindex.html' %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-primary mb-4">Enter Your Address & Contact Details</h2>
+
+        <!-- Button to load saved addresses -->
+        <div class="mb-4 text-end">
+            <a href="{% url 'select_address' product.id %}" class="btn btn-info">Use Saved Addresses</a>
+        </div>
+
+        <form method="POST" action="{% url 'add_new_address' product.id %}">
+            {% csrf_token %}
+
+            <!-- Full Name -->
+            <div class="mb-3">
+                <label for="full_name" class="form-label">Full Name</label>
+                <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Enter your full name" required>
+            </div>
+
+            <!-- Primary Contact Number -->
+            <div class="mb-3">
+                <label for="contact1" class="form-label">Primary Contact Number</label>
+                <input type="tel" id="contact1" name="contact1" class="form-control" placeholder="Enter primary contact number" required>
+                <div id="contact1Error" class="text-danger" style="display:none;">Contact number must be 10 digits and start with 6-9.</div>
+            </div>
+
+            <!-- Alternative Contact Number -->
+            <div class="mb-3">
+                <label for="contact2" class="form-label">Alternative Contact Number</label>
+                <input type="tel" id="contact2" name="contact2" class="form-control" placeholder="Enter alternative contact number" required>
+                <div id="contact2Error" class="text-danger" style="display:none;">Contact number must be 10 digits and start with 6-9.</div>
+            </div>
+
+            <!-- Locality -->
+            <div class="mb-3">
+                <label for="locality" class="form-label">Locality</label>
+                <input type="text" id="locality" name="locality" class="form-control" placeholder="Enter your locality" required>
+            </div>
+
+            <!-- Full Address -->
+            <div class="mb-3">
+                <label for="address" class="form-label">Full Address</label>
+                <textarea id="address" name="address" class="form-control" rows="3" placeholder="Enter your full address" required></textarea>
+            </div>
+
+            <!-- Pincode -->
+            <div class="mb-3">
+                <label for="pincode" class="form-label">Pincode</label>
+                <input type="text" id="pincode" name="pincode" class="form-control" placeholder="Enter your pincode" required>
+                <div id="pincodeError" class="text-danger" style="display:none;">Pincode must be 6 digits.</div>
+            </div>
+
+            <!-- Landmark -->
+            <div class="mb-3">
+                <label for="landmark" class="form-label">Landmark</label>
+                <input type="text" id="landmark" name="landmark" class="form-control" placeholder="Enter a landmark" required>
+            </div>
+
+            <!-- City -->
+            <div class="mb-3">
+                <label for="city" class="form-label">City</label>
+                <input type="text" id="city" name="city" class="form-control" placeholder="Enter your city" required>
+            </div>
+
+            <!-- State Dropdown -->
+            <div class="mb-3">
+                <label for="state" class="form-label">State</label>
+                <select id="state" name="state" class="form-select" required>
+                    <option value="" disabled selected>Select your state</option>
+                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                    <option value="Assam">Assam</option>
+                    <!-- Add more states here -->
+                </select>
+            </div>
+
+            <!-- Save Address Checkbox -->
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="saveAddress" name="save_address">
+                <label class="form-check-label" for="saveAddress">Save this address for future use</label>
+            </div>
+            <input type="hidden" id="bookQuantity" name="quantity" value="{{ quantity }}">
+
+            <button type="submit" class="btn btn-success btn-lg w-100">PROCEED</button>
+        </form>
+    </div>
+</div>
+
+<!-- Custom CSS for Professional Look -->
+<style>
+    .form-label {
+        font-weight: bold;
+    }
+    .form-control, .form-select {
+        border: 2px solid #ccc;
+        transition: all 0.3s;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+    .btn-lg {
+        font-size: 18px;
+        padding: 12px;
+    }
+    #savedAddressesBtn {
+        font-size: 16px;
+        padding: 10px 15px;
+    }
+</style>
+
+<!-- Optional JavaScript for Validations -->
+<script>
+    // Validate contact numbers
+    function validateContactNumber(contactField, errorField) {
+        const contactNumber = document.getElementById(contactField).value;
+        const contactError = document.getElementById(errorField);
+        const contactRegex = /^[6-9][0-9]{9}$/;
+
+        if (!contactRegex.test(contactNumber)) {
+            contactError.style.display = 'block';
+        } else {
+            contactError.style.display = 'none';
+        }
+    }
+
+    document.getElementById('contact1').addEventListener('input', function () {
+        validateContactNumber('contact1', 'contact1Error');
+    });
+
+    document.getElementById('contact2').addEventListener('input', function () {
+        validateContactNumber('contact2', 'contact2Error');
+    });
+
+    // Validate pincode
+    document.getElementById('pincode').addEventListener('input', function () {
+        const pincode = document.getElementById('pincode').value;
+        const pincodeError = document.getElementById('pincodeError');
+
+        if (pincode.length !== 6) {
+            pincodeError.style.display = 'block';
+        } else {
+            pincodeError.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

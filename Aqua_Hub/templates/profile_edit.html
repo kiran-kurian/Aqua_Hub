@@ -1,0 +1,99 @@
+{% extends 'newindex.html' %}
+
+{% block body %}
+<div class="container my-5">
+    <h2 class="text-center">User Profile</h2>
+    <form method="POST" class="shadow p-5 rounded bg-light" id="profileForm">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            <label for="username">Username</label>
+            <input type="text" name="username" class="form-control" value="{{ user.username }}" readonly>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="first_name">First Name</label>
+            <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}" required>
+            <small id="firstNameError" class="text-danger"></small>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="last_name">Last Name</label>
+            <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}" required>
+            <small id="lastNameError" class="text-danger"></small>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="email">Email</label>
+            <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+            <small id="emailError" class="text-danger"></small>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="phone_number">Phone Number</label>
+            <input type="text" name="phone_number" class="form-control" value="{{ user.phone_number }}" required>
+            <small id="phoneError" class="text-danger"></small>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-success btn-lg">Update Profile</button>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript for Live Validation -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const firstNameInput = document.querySelector('input[name="first_name"]');
+        const lastNameInput = document.querySelector('input[name="last_name"]');
+        const emailInput = document.querySelector('input[name="email"]');
+        const phoneNumberInput = document.querySelector('input[name="phone_number"]');
+
+        const firstNameError = document.getElementById('firstNameError');
+        const lastNameError = document.getElementById('lastNameError');
+        const emailError = document.getElementById('emailError');
+        const phoneError = document.getElementById('phoneError');
+
+        const nameRegex = /^[A-Za-z]+$/; // No spaces, only letters
+        const emailRegex = /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.(com|org|net)$/; // Valid domains
+        const phoneRegex = /^[6-9]\d{9}$/; // Indian phone numbers starting with 6-9
+
+        // Live validation for first name
+        firstNameInput.addEventListener('input', function () {
+            if (!nameRegex.test(firstNameInput.value.trim())) {
+                firstNameError.textContent = "First name must contain only letters and no spaces.";
+            } else {
+                firstNameError.textContent = "";
+            }
+        });
+
+        // Live validation for last name
+        lastNameInput.addEventListener('input', function () {
+            if (!nameRegex.test(lastNameInput.value.trim())) {
+                lastNameError.textContent = "Last name must contain only letters and no spaces.";
+            } else {
+                lastNameError.textContent = "";
+            }
+        });
+
+        // Live validation for email
+        emailInput.addEventListener('input', function () {
+            const emailValue = emailInput.value.trim();
+            if (!emailRegex.test(emailValue)) {
+                emailError.textContent = "Please enter a valid email address (e.g., example@gmail.com).";
+            } else {
+                emailError.textContent = "";
+            }
+        });
+
+        // Live validation for phone number
+        phoneNumberInput.addEventListener('input', function () {
+            if (!phoneRegex.test(phoneNumberInput.value.trim())) {
+                phoneError.textContent = "Phone number must be a valid 10-digit Indian number starting with 6-9.";
+            } else {
+                phoneError.textContent = "";
+            }
+        });
+    });
+</script>
+
+{% endblock %}

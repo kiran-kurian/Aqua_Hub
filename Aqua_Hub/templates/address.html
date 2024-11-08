@@ -1,0 +1,79 @@
+{% extends 'newindex.html' %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="card shadow-lg p-5">
+        <h2 class="text-primary mb-4 text-center">Select Delivery Address</h2>
+
+        <!-- Display Saved Addresses with Radio Buttons -->
+        {% if user_addresses %}
+            <div class="saved-addresses mb-4">
+                <h5 class="mb-3 text-muted">Choose a saved address</h5>
+                <form method="POST" action="{% url 'book_now' product_id quantity %}">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        {% for address in user_addresses %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-0 shadow-sm p-3 h-100">
+                                <div class="form-check">
+                                    <!-- Radio button for selecting address -->
+                                    <input class="form-check-input" type="radio" name="selected_address" id="address_{{ address.id }}" value="{{ address.id }}" required>
+                                    <label class="form-check-label" for="address_{{ address.id }}">
+                                        <div>
+                                            <strong>{{ address.full_name }}</strong><br>
+                                            {{ address.address }}, {{ address.locality }}<br>
+                                            {{ address.city }}, {{ address.state }} - {{ address.pincode }}<br>
+                                            <small><em>Landmark:</em> {{ address.landmark }}</small><br>
+                                            <small><em>Contact:</em> {{ address.contact1 }}{% if address.contact2 %} | Alt: {{ address.contact2 }}{% endif %}</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Hidden fields to pass quantity and product ID -->
+                    <input type="hidden" name="quantity" value="{{ quantity }}">
+                    <input type="hidden" name="product_id" value="{{ product_id }}">
+
+                    <!-- Proceed Button -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Proceed to Book Now</button>
+                    </div>
+                </form>
+            </div>
+        {% else %}
+            <p class="text-muted">No saved addresses found. Please add a new address below.</p>
+        {% endif %}
+
+        <!-- Add New Address Button -->
+        <div class="text-center mt-5">
+            <a href="{% url 'add_new_address' product_id %}" class="btn btn-outline-success btn-lg">+ Add New Address</a>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS for styling -->
+<style>
+    .form-check-input {
+        transform: scale(1.3);
+        margin-right: 10px;
+    }
+    .form-check-label div {
+        line-height: 1.5;
+    }
+    .card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    .btn-lg {
+        font-size: 1.1rem;
+        padding: 12px 24px;
+    }
+</style>
+{% endblock %}

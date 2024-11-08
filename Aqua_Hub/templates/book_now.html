@@ -1,0 +1,62 @@
+{% extends 'newindex.html' %}
+
+{% block body %}
+<div class="container my-5">
+    <h2 class="text-primary mb-4">ORDER SUMMARY</h2>
+
+    <div class="card shadow-lg p-4">
+        <div class="row">
+            <!-- Product Image Section -->
+            <div class="col-md-5">
+                <div class="product-image-wrapper">
+                    <img src="{{ product.image.url }}" alt="{{ product.product_name }}" class="img-fluid product-image">
+                </div>
+            </div>
+
+            <!-- Product Details Section -->
+            <div class="col-md-7">
+                <h4 class="fw-bold">{{ product.product_name }}</h4>
+                <p class="text-muted">Price per item: ₹{{ product.price }}</p>
+                <p class="text-info">Quantity: {{ quantity }}</p>
+                <p class="text-success">Total Price: ₹{{ total_price }}</p>
+
+                <!-- Delivery Charge -->
+                <p class="text-info">Delivery Charge: ₹{{ delivery_charge }}</p>
+
+                <!-- Final Price -->
+                <p class="text-danger">Final Price: ₹{{ final_price }}</p>
+                
+
+                <form method="POST" action="{% url 'order_now' product.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="address" value="{{ address }}">
+                    <input type="hidden" name="quantity" value="{{ quantity }}">
+                    <button type="submit" class="btn btn-success btn-lg">PROCEED TO PAYMENT</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+    .product-image-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+    }
+
+    .product-image {
+        width: 100%;
+        height: auto;
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    /* Hover effect */
+    .product-image-wrapper:hover .product-image {
+        transform: scale(1.1);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'newindex.html' %}
+
+{% block body %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">Register a Complaint</h2>
+
+    <form method="POST" id="complaintForm">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="seller_id" class="form-label">Select Seller</label>
+            <select name="seller_id" id="seller_id" class="form-control select2" required>
+                <option value="" disabled selected>Select a seller</option>
+                {% for seller in approved_sellers %}
+                    <option value="{{ seller.id }}">{{ seller.shop_name }}</option>
+                {% endfor %}
+            </select>
+            <div id="sellerError" class="error-message text-danger" style="display: none;">Please select a valid seller.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="order_id" class="form-label">Order ID</label>
+            <input type="text" name="payment_id" id="payment_id" class="form-control" placeholder="Enter Order ID" required>
+            <div id="orderIdError" class="error-message text-danger" style="display: none;">Order ID cannot be empty.</div>
+            <small class="form-text text-muted">If your complaint is regarding an order, please enter the Order ID.</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="subject" class="form-label">Subject</label>
+            <input type="text" name="subject" id="subject" class="form-control" placeholder="Enter subject" required>
+            <div id="subjectError" class="error-message text-danger" style="display: none;">Subject cannot be empty.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea name="description" id="description" class="form-control" rows="4" placeholder="Describe your complaint" required></textarea>
+            <div id="descriptionError" class="error-message text-danger" style="display: none;">Description cannot be empty.</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Complaint</button>
+    </form>
+</div>
+
+<!-- Include Select2 and custom JavaScript for validation and searching -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 for searchable dropdown
+        $('.select2').select2();
+
+        // Form validation
+        document.getElementById('complaintForm').addEventListener('submit', function(event) {
+            let isValid = true;
+            document.getElementById('sellerError').style.display = 'none';
+            document.getElementById('orderIdError').style.display = 'none';
+            document.getElementById('subjectError').style.display = 'none';
+            document.getElementById('descriptionError').style.display = 'none';
+
+            const sellerId = document.getElementById('seller_id').value;
+            const orderId = document.getElementById('order_id').value.trim();
+            const subject = document.getElementById('subject').value.trim();
+            const description = document.getElementById('description').value.trim();
+
+            if (!sellerId) {
+                document.getElementById('sellerError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!orderId) {
+                document.getElementById('orderIdError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!subject) {
+                document.getElementById('subjectError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!description) {
+                document.getElementById('descriptionError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+
+{% endblock %}
